@@ -1,5 +1,8 @@
 from mido import MidiFile
-from midi.notes import Notes
+from src.midi.notes import Notes
+
+ON = "note_on"
+OFF = "note_off"
 
 class NoteData:
 
@@ -31,10 +34,16 @@ class MidiDataExtractor:
 
         self.midi = MidiFile(file_name, clip=True)
 
-        self.ON = "note_on"
-        self.OFF = "note_off"
+        self.note_datas = None
 
-    def extract_data(self):
+    def get_data(self):
+
+        if self.note_datas is None:
+            self.note_datas = self.__extract_data()
+
+        return self.note_datas
+
+    def __extract_data(self):
 
         main_track = self.__get_main_track()
         messages = self.__get_notes_messages(main_track)
@@ -54,7 +63,7 @@ class MidiDataExtractor:
             for note in current_notes_durations:
                 current_notes_durations[note] += msg.time
 
-            if msg.type==self.ON:
+            if msg.type==ON:
                 note_data = NoteData()
                 note_data.set_frequency(self.notes.get_frequency(note_number))
                 note_data.set_delta(last_delta)
@@ -86,6 +95,6 @@ class MidiDataExtractor:
 
     def __get_notes_messages(self, track):
 
-        messages = [msg for msg in track if msg.type==self.ON or msg.type==self.OFF]
+        messages = [msg for msg in track if msg.type==ON or msg.type==OFF]
 
         return messages
