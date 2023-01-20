@@ -27,8 +27,8 @@ def load_dataset(notes):
         if VERBOSE:
             print("Standardizing dataframe")
 
-        #max_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
-        mean_freq, std_freq = numerical_processing.standardize_data(dataframe, "Frequencies")
+        max_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
+        #mean_freq, std_freq = numerical_processing.standardize_data(dataframe, "Frequencies")
         mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
         mean_del, std_del = numerical_processing.standardize_data(dataframe, "Deltas")
 

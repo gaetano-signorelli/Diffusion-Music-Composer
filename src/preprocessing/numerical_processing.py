@@ -31,13 +31,19 @@ def standardize_data(dataframe, column):
 
     return mean, std
 
-def normalize_data(dataframe, column):
+def normalize_data(dataframe, column, negative_range=True):
 
     mean, std, max = get_statistics(dataframe, column)
 
-    dataframe[column] = dataframe[column].apply(
-    lambda sequence: sequence / max
-    )
+    if negative_range:
+        dataframe[column] = dataframe[column].apply(
+        lambda sequence: 2 * (sequence / max) - 1
+        )
+
+    else:
+        dataframe[column] = dataframe[column].apply(
+        lambda sequence: sequence / max
+        )
 
     return max
 
@@ -50,5 +56,10 @@ def convert_s_to_ms(sequence):
 def inverse_standardize_data(sequence, mean, std):
     return (sequence * std) + mean
 
-def inverse_normalize_data(sequence, max):
-    return sequence * max
+def inverse_normalize_data(sequence, max, negative_range=True):
+
+    if negative_range:
+        return (sequence + 1) / 2 * max
+
+    else:
+        return sequence * max
