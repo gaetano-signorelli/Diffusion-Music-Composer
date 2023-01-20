@@ -4,7 +4,6 @@ from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
-import math
 
 from src.midi.midi_converter import MidiDataExtractor
 
@@ -114,9 +113,9 @@ class DataframeHandler:
     def __split_data(self, data):
 
         len_data = data.shape[-1]
-        
-        n_chunks = math.floor(len_data/NOTES_LENGTH)
-        max_len = n_chunks * len_data
+
+        n_chunks = len_data//NOTES_LENGTH
+        max_len = n_chunks * NOTES_LENGTH
 
         truncated_data = data[0:max_len]
 

@@ -82,7 +82,7 @@ class MidiDataExtractor:
 
     def __get_main_track(self):
 
-        if len(self.midi.tracks==1):
+        if len(self.midi.tracks)==1:
             return self.midi.tracks[0]
 
         main_track = self.midi.tracks[0]

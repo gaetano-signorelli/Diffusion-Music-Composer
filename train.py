@@ -1,8 +1,8 @@
 import numpy as np
 
 from src.midi.notes import Notes
-import DataframeHandler from src.preprocessing.dataframe_builder
-import src.preprocessing.numerical_preprocessing as numerical_preprocessing
+from src.preprocessing.dataframe_builder import DataframeHandler
+import src.preprocessing.numerical_processing as numerical_processing
 
 from config import *
 
@@ -14,22 +14,23 @@ def load_dataset(notes):
     if VERBOSE:
         print("Converting pitches to log scale")
 
-    numerical_preprocessing.convert_to_log_scale(dataframe, "Frequencies")
+    numerical_processing.convert_to_log_scale(dataframe, "Frequencies")
 
     if VERBOSE:
         print("Converting seconds to milliseconds")
 
-    numerical_preprocessing.convert_ms_to_s(dataframe, "Durations")
-    numerical_preprocessing.convert_ms_to_s(dataframe, "Deltas")
+    numerical_processing.convert_ms_to_s(dataframe, "Durations")
+    numerical_processing.convert_ms_to_s(dataframe, "Deltas")
 
     if STANDARDIZE:
 
         if VERBOSE:
             print("Standardizing dataframe")
 
-        mean_freq, std_freq = numerical_preprocessing.standardize_data(dataframe, "Frequencies")
-        mean_dur, std_dur = numerical_preprocessing.standardize_data(dataframe, "Durations")
-        mean_del, std_del = numerical_preprocessing.standardize_data(dataframe, "Deltas")
+        #max_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
+        mean_freq, std_freq = numerical_processing.standardize_data(dataframe, "Frequencies")
+        mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
+        mean_del, std_del = numerical_processing.standardize_data(dataframe, "Deltas")
 
         #TODO save means and stds for inference
 
@@ -47,3 +48,4 @@ if __name__ == '__main__':
     notes = Notes()
 
     dataset = load_dataset(notes)
+    print(dataset.shape)
