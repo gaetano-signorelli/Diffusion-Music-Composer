@@ -88,7 +88,7 @@ class MidiDataExtractor:
         main_track = self.midi.tracks[0]
 
         for track in self.midi.tracks[1:]:
-            if len(track)>main_track:
+            if len(track)>len(main_track):
                 main_track = track
 
         return main_track

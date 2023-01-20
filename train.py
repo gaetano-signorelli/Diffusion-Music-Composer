@@ -33,12 +33,14 @@ def load_dataset(notes):
 
         #TODO save means and stds for inference
 
-    frequencies = np.stack(dataframe["Frequencies"], axis=0)
-    durations = np.stack(dataframe["Durations"], axis=0)
-    deltas = np.stack(dataframe["Deltas"], axis=0)
+    frequencies = np.stack(dataframe["Frequencies"], axis=0) #(Batch size, W)
+    durations = np.stack(dataframe["Durations"], axis=0) #(Batch size, W)
+    deltas = np.stack(dataframe["Deltas"], axis=0) #(Batch size, W)
 
-    dataset = np.stack((frequencies, durations, deltas), axis=0)
-    dataset = np.expand_dims(dataset, axis=0) #??? TODO: fix
+    dataset = np.stack((frequencies, durations, deltas), axis=-1) #(Batch size, W, 3)
+    dataset = np.expand_dims(dataset, axis=1) #(Batch size, 1, W, 3)
+
+    return dataset
 
 if __name__ == '__main__':
 

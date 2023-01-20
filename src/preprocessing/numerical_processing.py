@@ -14,7 +14,7 @@ def convert_ms_to_s(dataframe, column):
 
 def get_statistics(dataframe, column):
 
-    data = np.concatenate(dataframe[column], axis=0)
+    data = np.concatenate(dataframe[column], axis=None)
     mean = np.mean(data)
     std = np.std(data)
 

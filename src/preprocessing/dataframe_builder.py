@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
+import math
 
 from src.midi.midi_converter import MidiDataExtractor
 
@@ -25,7 +26,7 @@ class DataframeHandler:
             self.dataframe, save = self.__load()
 
             if save:
-                self.__save()
+                self.save()
 
         return self.dataframe
 
@@ -113,12 +114,12 @@ class DataframeHandler:
     def __split_data(self, data):
 
         len_data = data.shape[-1]
-        chunks = int(len_data/NOTES_LENGTH)
+        
+        n_chunks = math.floor(len_data/NOTES_LENGTH)
+        max_len = n_chunks * len_data
 
-        splitted_data = np.array_split(data, chunks)
+        truncated_data = data[0:max_len]
 
-        last_data = splitted_data[-1]
-        if (NOTES_LENGTH != last_data.shape[-1]):
-            splitted_data = splitted_data[:-1]
+        splitted_data = np.array_split(truncated_data, n_chunks)
 
         return splitted_data

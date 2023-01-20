@@ -15,7 +15,10 @@ class Notes:
         self.notes = self.__instantiate_notes()
 
     def get_frequency(note_number):
-        return notes[note_number].frequency
+        return self.notes[note_number].frequency
+
+    def get_name(note_number):
+        return self.notes[note_number].name
 
     def __instantiate_notes(self):
 
