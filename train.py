@@ -48,4 +48,6 @@ if __name__ == '__main__':
     notes = Notes()
 
     dataset = load_dataset(notes)
-    print(dataset.shape)
+
+    if VERBOSE:
+        print("Dataset preprocessed and loaded successfully")
