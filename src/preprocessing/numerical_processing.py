@@ -51,7 +51,7 @@ def convert_to_pitch_scale(sequence):
     return 10**sequence
 
 def convert_s_to_ms(sequence):
-    return int(sequence * 1000)
+    return np.int_(sequence * 1000)
 
 def inverse_standardize_data(sequence, mean, std):
     return (sequence * std) + mean
@@ -63,3 +63,28 @@ def inverse_normalize_data(sequence, max, negative_range=True):
 
     else:
         return sequence * max
+
+def sample_to_midi_values(sample, max_freq, mean_dur, std_dur, mean_del, std_del):
+
+    sequence = sample[0] #(Notes length, 3)
+    sequence = np.transpose(sequence) #(3, Notes length)
+
+    frequencies = sequence[0]
+    durations = sequence[1]
+    deltas = sequence[2]
+
+    if STANDARDIZE:
+        frequencies = inverse_normalize_data(frequencies, max_freq)
+        durations = inverse_standardize_data(durations, mean_dur, std_dur)
+        deltas = inverse_standardize_data(deltas, mean_del, std_del)
+
+    durations = convert_s_to_ms(durations)
+    deltas = convert_s_to_ms(deltas)
+
+    frequencies = convert_to_pitch_scale(frequencies)
+
+    frequencies = np.clip(frequencies, 0.0, None)
+    durations = np.clip(durations, 1, None)
+    deltas = np.clip(deltas, 0, None)
+
+    return frequencies, durations, deltas

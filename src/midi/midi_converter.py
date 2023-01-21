@@ -98,3 +98,23 @@ class MidiDataExtractor:
         messages = [msg for msg in track if msg.type==ON or msg.type==OFF]
 
         return messages
+
+class MidiDataBuilder:
+
+    def __init__(self, frequencies, durations, deltas, notes):
+
+        self.frequencies = frequencies
+        self.durations = durations
+        self.deltas = deltas
+
+        self.notes = notes
+
+    def build_and_save(self, file_name):
+
+        pitches = [self.notes.get_closest_note(frequency) for frequency in frequencies]
+
+        #TODO: build messages (Notes on, notes off, durations and deltas)
+
+        #TODO: build midi from messages, instrument ecc.
+
+        #TODO: save midi in memory

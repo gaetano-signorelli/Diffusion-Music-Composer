@@ -1,8 +1,12 @@
 import numpy as np
+import tensorflow as tf
 
 from src.midi.notes import Notes
 from src.preprocessing.dataframe_builder import DataframeHandler
 import src.preprocessing.numerical_processing as numerical_processing
+
+from src.model.callbacks import SaveUpdateStepCallback
+from src.model.model_handler import ModelHandler
 
 from config import *
 
@@ -32,7 +36,18 @@ def load_dataset(notes):
         mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
         mean_del, std_del = numerical_processing.standardize_data(dataframe, "Deltas")
 
-        #TODO save means and stds for inference
+        normalization_dict = {
+        "max_freq":max_freq,
+        "mean_dur":mean_dur,
+        "std_dur":std_dur,
+        "mean_del":mean_del,
+        "std_del":std_del
+        }
+
+        #TODO: add save and load
+
+    else:
+        normalization_dict = dict()
 
     frequencies = np.stack(dataframe["Frequencies"], axis=0) #(Batch size, W)
     durations = np.stack(dataframe["Durations"], axis=0) #(Batch size, W)
@@ -41,13 +56,29 @@ def load_dataset(notes):
     dataset = np.stack((frequencies, durations, deltas), axis=-1) #(Batch size, W, 3)
     dataset = np.expand_dims(dataset, axis=1) #(Batch size, 1, W, 3)
 
-    return dataset
+    return dataset, normalization_dict
 
 if __name__ == '__main__':
 
     notes = Notes()
 
-    dataset = load_dataset(notes)
+    dataset, normalization_dict = load_dataset(notes)
 
     if VERBOSE:
         print("Dataset preprocessed and loaded successfully")
+
+    input_shape = (1, NOTES_LENGTH, 3)
+
+    model_handler = ModelHandler(notes, input_shape, N_HEADS, TIME_EMBEDDING_SIZE,
+                                BETA_START, BETA_END, NOISE_STEPS, normalization_dict
+                                load_model=LOAD_MODEL)
+    model_handler.build_model()
+
+    callback = SaveUpdateStepCallback(model_handler)
+
+    remaining_epochs = EPOCHS - model_handler.current_step
+
+    model_handler.model.fit(x=dataset,
+                            batch_size=BATCH_SIZE,
+                            callbacks=[callback],
+                            epochs=remaining_epochs)
