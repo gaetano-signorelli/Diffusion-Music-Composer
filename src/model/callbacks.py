@@ -3,7 +3,7 @@ from tensorflow.keras.callbacks import Callback
 
 from src.model.model_handler import ModelHandler
 
-from src.config import *
+from config import *
 
 class SaveUpdateStepCallback(Callback):
 

@@ -21,10 +21,10 @@ def load_dataset(notes):
     numerical_processing.convert_to_log_scale(dataframe, "Frequencies")
 
     if VERBOSE:
-        print("Converting seconds to milliseconds")
+        print("Converting ticks to beats")
 
-    numerical_processing.convert_ms_to_s(dataframe, "Durations")
-    numerical_processing.convert_ms_to_s(dataframe, "Deltas")
+    numerical_processing.convert_ticks_to_beats(dataframe, "Durations")
+    numerical_processing.convert_ticks_to_beats(dataframe, "Deltas")
 
     if STANDARDIZE:
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     input_shape = (1, NOTES_LENGTH, 3)
 
     model_handler = ModelHandler(notes, input_shape, N_HEADS, TIME_EMBEDDING_SIZE,
-                                BETA_START, BETA_END, NOISE_STEPS, normalization_dict
+                                BETA_START, BETA_END, NOISE_STEPS, normalization_dict,
                                 load_model=LOAD_MODEL)
     model_handler.build_model()
 

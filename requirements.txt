@@ -1,3 +1,5 @@
 tensorflow
 numpy
 tqdm
+mido
+MIDIUtil

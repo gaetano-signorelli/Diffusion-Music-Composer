@@ -8,12 +8,12 @@ from src.model.diffusion import Diffusion
 from src.preprocessing.numerical_processing import sample_to_midi_values
 from src.midi.midi_converter import MidiDataBuilder
 
-from src.config import *
+from config import *
 
 class ModelHandler:
 
     def __init__(self, notes, input_shape, n_heads, time_embedding_size,
-                beta_start, beta_end, noise_steps, normalization_dict
+                beta_start, beta_end, noise_steps, normalization_dict,
                 load_model=None, weights_path=None, verbose=True):
 
         self.notes = notes
@@ -87,7 +87,7 @@ class ModelHandler:
 
         last_weights = None
 
-        pattern_unet_weights = re.compile("unet_\d+.npy")
+        pattern_unet_weights = re.compile("unet_\d+.h5")
 
         weights_files = os.listdir(self.weights_path)
         weights_files.sort(reverse=True)
@@ -97,18 +97,21 @@ class ModelHandler:
 
                 if pattern_unet_weights.match(file) and last_weights is None:
                     last_weights = os.path.join(self.weights_path, file)
-                    self.current_step = int(last_weights[-10:-4])
+                    self.current_step = int(last_weights[-9:-3])
                     break
 
         return last_weights
 
     def save_weights(self):
 
-        weights = self.model.get_network_weights()
+        #weights = self.model.get_network_weights()
 
         current_step = str(self.current_step).zfill(6)
+        save_path = UNET_WEIGHTS_PATH.format(current_step)
 
-        np.save(UNET_WEIGHTS_PATH.format(current_step), weights)
+        #np.save(save_path, weights)
+
+        self.model.save_weights(save_path)
 
         if self.verbose:
             print()
@@ -116,9 +119,11 @@ class ModelHandler:
 
     def load_weights(self, last_weights_path):
 
-        last_weights = np.load(last_weights_path, allow_pickle=True)
+        #last_weights = np.load(last_weights_path, allow_pickle=True)
 
-        self.model.set_network_weights(last_weights)
+        #self.model.set_network_weights(last_weights)
+
+        self.model.load_weights(last_weights_path)
 
     def update_current_step(self):
 

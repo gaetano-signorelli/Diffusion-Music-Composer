@@ -1,5 +1,8 @@
 from mido import MidiFile
+from midiutil.MidiFile import MIDIFile
 from src.midi.notes import Notes
+
+from config import TICKS_PER_BEAT, BPM
 
 ON = "note_on"
 OFF = "note_off"
@@ -44,6 +47,8 @@ class MidiDataExtractor:
         return self.note_datas
 
     def __extract_data(self):
+
+        self.midi.ticks_per_beat = TICKS_PER_BEAT
 
         main_track = self.__get_main_track()
         messages = self.__get_notes_messages(main_track)
@@ -91,6 +96,7 @@ class MidiDataExtractor:
             if len(track)>len(main_track):
                 main_track = track
 
+        print(self.midi.ticks_per_beat)
         return main_track
 
     def __get_notes_messages(self, track):
@@ -111,10 +117,20 @@ class MidiDataBuilder:
 
     def build_and_save(self, file_name):
 
-        pitches = [self.notes.get_closest_note(frequency) for frequency in frequencies]
+        pitches = [self.notes.get_closest_note(frequency) for frequency in self.frequencies]
 
-        #TODO: build messages (Notes on, notes off, durations and deltas)
+        track = 0
+        channel = 0
+        time = 0 # In beats
+        tempo = BPM # In BPM
+        volume = 100 # 0-127, as per the MIDI standard
 
-        #TODO: build midi from messages, instrument ecc.
+        song = MIDIFile(1, deinterleave=False) # One track, defaults to format 1 (tempo track automatically created)
+        song.addTempo(track, time, tempo)
 
-        #TODO: save midi in memory
+        for pitch, duration, delta in zip(pitches, self.durations, self.deltas):
+            time += delta
+            song.addNote(track, channel, pitch, time, duration, volume)
+
+        with open(file_name, "wb") as output_file:
+            song.writeFile(output_file)

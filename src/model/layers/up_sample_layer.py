@@ -9,7 +9,7 @@ class UpSampleLayer(layers.Layer):
 
         super(UpSampleLayer, self).__init__()
 
-        self.h = input_shape[0] * 2
+        self.h = input_shape[0]
         self.w = input_shape[1] * 2
         self.c = input_shape[2] * 2
 

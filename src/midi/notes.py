@@ -24,7 +24,7 @@ class Notes:
 
     def get_closest_note(self, frequency):
 
-        dist = np.sum((frequencies - frequency)**2)
+        dist = np.abs((self.frequencies - frequency))
         return np.argmin(dist)
 
     def __instantiate_notes(self):
