@@ -28,6 +28,7 @@ class ModelHandler:
         self.verbose = verbose
 
         self.max_freq = normalization_dict.get("max_freq")
+        self.min_freq = normalization_dict.get("min_freq")
         self.mean_dur = normalization_dict.get("mean_dur")
         self.std_dur = normalization_dict.get("std_dur")
         self.mean_del = normalization_dict.get("mean_del")
@@ -141,7 +142,7 @@ class ModelHandler:
         for i, sample in enumerate(samples):
 
             frequencies, durations, deltas = sample_to_midi_values(
-            sample, self.max_freq, self.mean_dur, self.std_dur,
+            sample, self.max_freq, self.min_freq, self.mean_dur, self.std_dur,
             self.mean_del, self.std_del
             )
 

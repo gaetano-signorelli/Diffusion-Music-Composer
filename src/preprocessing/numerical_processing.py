@@ -14,18 +14,25 @@ def convert_ticks_to_beats(dataframe, column):
     lambda sequence: sequence / float(TICKS_PER_BEAT)
     )
 
-def get_statistics(dataframe, column):
+def get_standard_statistics(dataframe, column):
 
     data = np.concatenate(dataframe[column], axis=None)
     mean = np.mean(data)
     std = np.std(data)
-    max = np.amax(data)
 
-    return mean, std, max
+    return mean, std
+
+def get_normal_statistics(dataframe, column):
+
+    data = np.concatenate(dataframe[column], axis=None)
+    max = np.amax(data)
+    min = np.amin(data)
+
+    return max, min
 
 def standardize_data(dataframe, column):
 
-    mean, std, max = get_statistics(dataframe, column)
+    mean, std = get_standard_statistics(dataframe, column)
 
     dataframe[column] = dataframe[column].apply(
     lambda sequence: (sequence - mean) / std
@@ -35,17 +42,16 @@ def standardize_data(dataframe, column):
 
 def normalize_data(dataframe, column, negative_range=True):
 
-    mean, std, max = get_statistics(dataframe, column)
+    max, mean = get_normal_statistics(dataframe, column)
 
     if negative_range:
         dataframe[column] = dataframe[column].apply(
-        lambda sequence: 2 * (sequence / max) - 1
-        #lambda sequence: 2* ((sequence-min)/(max-min)) - 1
+        lambda sequence: 2 * ((sequence-min)/(max-min)) - 1
         )
 
     else:
         dataframe[column] = dataframe[column].apply(
-        lambda sequence: sequence / max
+        lambda sequence: (sequence-min)/(max-min)
         )
 
     return max
@@ -59,16 +65,16 @@ def convert_beats_to_ticks(sequence):
 def inverse_standardize_data(sequence, mean, std):
     return (sequence * std) + mean
 
-def inverse_normalize_data(sequence, max, negative_range=True):
+def inverse_normalize_data(sequence, max, min, negative_range=True):
 
     if negative_range:
-        return (sequence + 1) / 2 * max
-        #return ((sequence + 1) / 2 *(mix-min)) + min
+        return ((sequence + 1) / 2 * (max-min)) + min
 
     else:
-        return sequence * max
+        return (sequence * (max-min)) + min
 
-def sample_to_midi_values(sample, max_freq, mean_dur, std_dur, mean_del, std_del):
+def sample_to_midi_values(sample, max_freq, min_freq,
+                        mean_dur, std_dur, mean_del, std_del):
 
     sequence = sample[0] #(Notes length, 3)
     sequence = np.transpose(sequence) #(3, Notes length)
@@ -78,7 +84,7 @@ def sample_to_midi_values(sample, max_freq, mean_dur, std_dur, mean_del, std_del
     deltas = sequence[2]
 
     if STANDARDIZE:
-        frequencies = inverse_normalize_data(frequencies, max_freq)
+        frequencies = inverse_normalize_data(frequencies, max_freq, min_freq)
         durations = inverse_standardize_data(durations, mean_dur, std_dur)
         deltas = inverse_standardize_data(deltas, mean_del, std_del)
 

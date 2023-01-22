@@ -4,13 +4,14 @@ import os
 VERBOSE = True
 STANDARDIZE = True
 TICKS_PER_BEAT = 960
-BPM = 120
+BPM = 60
 NOTES_LENGTH = 256 # define the number of notes a piece of music can have
 
 #Paths
 NOTES_CONVERSION_TABLE_PATH = os.path.join("data","notes_conversion_table.txt")
 DATAFRAME_PATH = os.path.join("data","dataframe.pkl")
-DATASET_PATH = os.path.join("data","Classical music dataset")
+STATISTICS_PATH = os.path.join("data","statistics.pkl")
+DATASET_PATH = os.path.join("data","Classical music dataset", "1 - All")
 WEIGHTS_PATH = "weights"
 UNET_WEIGHTS_PATH = os.path.join(WEIGHTS_PATH,"unet_{}.h5")
 
@@ -18,7 +19,7 @@ UNET_WEIGHTS_PATH = os.path.join(WEIGHTS_PATH,"unet_{}.h5")
 BETA_START = 1e-4
 BETA_END = 0.02
 NOISE_STEPS = 1000
-N_HEADS = 1
+N_HEADS = 2
 TIME_EMBEDDING_SIZE = 256
 
 #Training
@@ -28,10 +29,10 @@ EPOCHS = 100
 BATCH_SIZE = 4
 
 #Saving/Loading
-SAVE_MODEL = False
+SAVE_MODEL = True
 LOAD_MODEL = True
-EPOCHS_BEFORE_SAVE = 100
+EPOCHS_BEFORE_SAVE = 5
 
 #Sampling
-N_SAMPLES = 1
+N_SAMPLES = 2
 SAMPLES_PATH = os.path.join("data","samples","sample_epoch{}_{}.mid")

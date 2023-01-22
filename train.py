@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import tensorflow as tf
 
@@ -31,20 +33,22 @@ def load_dataset(notes):
         if VERBOSE:
             print("Standardizing dataframe")
 
-        max_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
+        max_freq, min_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
         #mean_freq, std_freq = numerical_processing.standardize_data(dataframe, "Frequencies")
         mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
         mean_del, std_del = numerical_processing.standardize_data(dataframe, "Deltas")
 
         normalization_dict = {
         "max_freq":max_freq,
+        "min_freq":min_freq,
         "mean_dur":mean_dur,
         "std_dur":std_dur,
         "mean_del":mean_del,
         "std_del":std_del
         }
 
-        #TODO: add save and load
+        with open(STATISTICS_PATH, 'wb') as handle:
+            pickle.dump(normalization_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     else:
         normalization_dict = dict()
@@ -66,6 +70,7 @@ if __name__ == '__main__':
 
     if VERBOSE:
         print("Dataset preprocessed and loaded successfully")
+        print("There are {} samples in the dataset".format(len(dataset)))
 
     input_shape = (1, NOTES_LENGTH, 3)
 
