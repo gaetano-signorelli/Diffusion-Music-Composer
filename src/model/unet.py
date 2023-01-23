@@ -20,9 +20,9 @@ class UNet(Model):
 
         self.positional_encoding_layer = PositionalEncodingLayer(time_embedding_size)
 
-        self.conv_input = ConvolutionalBlockLayer(3,64)
+        self.conv_input = ConvolutionalBlockLayer(7,64)
 
-        self.down1 = DownSampleLayer((self.h,self.w,64), 128, 7)
+        self.down1 = DownSampleLayer((self.h,self.w,64), 128, 5)
         self.sa1 = SelfAttentionLayer((self.h,self.w//2,128), n_heads)
         self.down2 = DownSampleLayer((self.h,self.w//2,128), 256, 5)
         self.sa2 = SelfAttentionLayer((self.h,self.w//4,256), n_heads)
@@ -37,7 +37,7 @@ class UNet(Model):
         self.sa4 = SelfAttentionLayer((self.h,self.w//4,128), n_heads)
         self.up2 = UpSampleLayer((self.h,self.w//4,128), 64, 5)
         self.sa5 = SelfAttentionLayer((self.h,self.w//2,64), n_heads)
-        self.up3 = UpSampleLayer((self.h,self.w//2,64), 64, 7)
+        self.up3 = UpSampleLayer((self.h,self.w//2,64), 64, 5)
         self.sa6 = SelfAttentionLayer((self.h,self.w,64), n_heads)
 
         self.conv_output = layers.Conv2D(3, kernel_size=1)

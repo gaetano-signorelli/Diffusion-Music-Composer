@@ -60,7 +60,7 @@ class MidiDataExtractor:
 
         last_delta = 0
 
-        for msg in messages:
+        for i, msg in enumerate(messages):
 
             note_number = msg.note
             last_delta += msg.time
@@ -68,20 +68,24 @@ class MidiDataExtractor:
             for note in current_notes_durations:
                 current_notes_durations[note] += msg.time
 
-            if msg.type==ON:
-                note_data = NoteData()
-                note_data.set_frequency(self.notes.get_frequency(note_number))
-                note_data.set_delta(last_delta)
-                last_delta = 0
+            if msg.type==ON and msg.velocity!=0:
+                if not note_number in open_note_datas:
+                    note_data = NoteData()
+                    note_data.set_frequency(self.notes.get_frequency(note_number))
+                    note_data.set_delta(last_delta)
+                    last_delta = 0
 
-                current_notes_durations[note_number] = 0
-                open_note_datas[note_number] = note_data
-                note_datas.append(note_data)
+                    current_notes_durations[note_number] = 0
+                    open_note_datas[note_number] = note_data
+                    note_datas.append(note_data)
 
             else:
-                duration = current_notes_durations.pop(note_number)
-                note_data = open_note_datas.pop(note_number)
-                note_data.set_duration(duration)
+                if note_number in open_note_datas:
+                    duration = current_notes_durations.pop(note_number)
+                    note_data = open_note_datas.pop(note_number)
+                    note_data.set_duration(duration)
+
+                    last_closed_note = note_number
 
         return note_datas
 
@@ -96,7 +100,6 @@ class MidiDataExtractor:
             if len(track)>len(main_track):
                 main_track = track
 
-        print(self.midi.ticks_per_beat)
         return main_track
 
     def __get_notes_messages(self, track):

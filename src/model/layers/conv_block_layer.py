@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras import layers, activations
 
+from src.model.layers.squeeze_excitation_layer import SqueezeAndExcitationLayer
+
 class ConvolutionalBlockLayer(layers.Layer):
 
     def __init__(self, kernel_size, out_channels, mid_channels=None, residual=False):
@@ -25,14 +27,21 @@ class ConvolutionalBlockLayer(layers.Layer):
         self.group_norm_layer_1 = layers.LayerNormalization()
         self.group_norm_layer_2 = layers.LayerNormalization()
 
+        self.squeeze_excitation_layer_1 = SqueezeAndExcitationLayer(mid_channels)
+        self.squeeze_excitation_layer_2 = SqueezeAndExcitationLayer(out_channels)
+
     @tf.function
     def call(self, x):
 
         conv_x = self.conv_layer_1(x)
         conv_x = self.group_norm_layer_1(conv_x)
         conv_x = activations.gelu(conv_x)
+
+        conv_x = self.squeeze_excitation_layer_1(conv_x)
+
         conv_x = self.conv_layer_2(conv_x)
         conv_x = self.group_norm_layer_2(conv_x)
+        conv_x = self.squeeze_excitation_layer_2(conv_x)
 
         if self.residual:
             return activations.gelu(x + conv_x)

@@ -119,6 +119,10 @@ class DataframeHandler:
 
         truncated_data = data[0:max_len]
 
-        splitted_data = np.array_split(truncated_data, n_chunks)
+        if n_chunks > 0:
+            splitted_data = np.array_split(truncated_data, n_chunks)
+
+        else:
+            splitted_data = []
 
         return splitted_data

@@ -42,7 +42,7 @@ def standardize_data(dataframe, column):
 
 def normalize_data(dataframe, column, negative_range=True):
 
-    max, mean = get_normal_statistics(dataframe, column)
+    max, min = get_normal_statistics(dataframe, column)
 
     if negative_range:
         dataframe[column] = dataframe[column].apply(
@@ -54,7 +54,7 @@ def normalize_data(dataframe, column, negative_range=True):
         lambda sequence: (sequence-min)/(max-min)
         )
 
-    return max
+    return max, min
 
 def convert_to_pitch_scale(sequence):
     return 10**sequence
