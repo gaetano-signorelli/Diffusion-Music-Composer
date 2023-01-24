@@ -3,3 +3,4 @@ __pycache__
 *.pkl
 
 data/Classical music dataset
+weights
