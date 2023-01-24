@@ -133,7 +133,7 @@ class ModelHandler:
     def save_samples(self):
 
         if self.verbose:
-            print("Generating samples...")
+            print("\nGenerating samples...")
 
         samples = self.model.sample(N_SAMPLES)
 

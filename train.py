@@ -57,8 +57,8 @@ def load_dataset(notes):
     durations = np.stack(dataframe["Durations"], axis=0) #(Batch size, W)
     deltas = np.stack(dataframe["Deltas"], axis=0) #(Batch size, W)
 
-    dataset = np.stack((frequencies, durations, deltas), axis=-1) #(Batch size, W, 3)
-    dataset = np.expand_dims(dataset, axis=1) #(Batch size, 1, W, 3)
+    dataset = np.stack((frequencies, durations, deltas), axis=1) #(Batch size, 3, W)
+    dataset = np.expand_dims(dataset, axis=-1) #(Batch size, 3, W, 1)
 
     return dataset, normalization_dict
 
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         print("Dataset preprocessed and loaded successfully")
         print("There are {} samples in the dataset".format(len(dataset)))
 
-    input_shape = (1, NOTES_LENGTH, 3)
+    input_shape = (3, NOTES_LENGTH, 1)
 
     model_handler = ModelHandler(notes, input_shape, N_HEADS, TIME_EMBEDDING_SIZE,
                                 BETA_START, BETA_END, NOISE_STEPS, normalization_dict,

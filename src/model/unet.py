@@ -15,6 +15,7 @@ class UNet(Model):
 
         self.h = input_shape[0]
         self.w = input_shape[1]
+        self.c = input_shape[2]
 
         assert self.w % 8 == 0
 
@@ -40,7 +41,7 @@ class UNet(Model):
         self.up3 = UpSampleLayer((self.h,self.w//2,64), 64, 5)
         self.sa6 = SelfAttentionLayer((self.h,self.w,64), n_heads)
 
-        self.conv_output = layers.Conv2D(3, kernel_size=1)
+        self.conv_output = layers.Conv2D(self.c, kernel_size=1)
 
     @tf.function
     def call(self, inputs):

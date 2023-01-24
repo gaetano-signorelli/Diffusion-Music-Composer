@@ -76,8 +76,7 @@ def inverse_normalize_data(sequence, max, min, negative_range=True):
 def sample_to_midi_values(sample, max_freq, min_freq,
                         mean_dur, std_dur, mean_del, std_del):
 
-    sequence = sample[0] #(Notes length, 3)
-    sequence = np.transpose(sequence) #(3, Notes length)
+    sequence = np.squeeze(sample)
 
     frequencies = sequence[0]
     durations = sequence[1]
@@ -91,7 +90,7 @@ def sample_to_midi_values(sample, max_freq, min_freq,
     #durations = convert_beats_to_ticks(durations)
     #deltas = convert_beats_to_ticks(deltas)
 
-    frequencies = np.clip(frequencies, None, np.log10(12543.850))
+    frequencies = np.clip(frequencies, np.log10(8.176), np.log10(12543.850))
     frequencies = convert_to_pitch_scale(frequencies)
 
     durations = np.clip(np.int_(durations), 1, None)
