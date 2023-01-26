@@ -63,7 +63,7 @@ class DataframeHandler:
         dataframe_rows = []
 
         for file in tqdm(os.listdir(self.dataset_path)):
-            if file.endswith(".mid"):
+            if file.endswith(".mid") or file.endswith(".midi"):
                 file_path = os.path.join(self.dataset_path, file)
 
                 data_extractor = MidiDataExtractor(file_path, self.notes)
