@@ -115,7 +115,6 @@ class MidiDataBuilder:
         self.frequencies = frequencies
         self.durations = durations
         self.deltas = deltas
-
         self.notes = notes
 
     def build_and_save(self, file_name):
@@ -131,9 +130,16 @@ class MidiDataBuilder:
         song = MIDIFile(1, deinterleave=False) # One track, defaults to format 1 (tempo track automatically created)
         song.addTempo(track, time, tempo)
 
-        for pitch, duration, delta in zip(pitches, self.durations, self.deltas):
-            time += delta
-            song.addNote(track, channel, pitch, time, duration, volume)
+        if self.durations is None or self.deltas is None:
+            for pitch in pitches:
+                time += 0.25
+                duration = 0.25
+                song.addNote(track, channel, pitch, time, duration, volume)
+
+        else:
+            for pitch, duration, delta in zip(pitches, self.durations, self.deltas):
+                time += delta
+                song.addNote(track, channel, pitch, time, duration, volume)
 
         with open(file_name, "wb") as output_file:
             song.writeFile(output_file)

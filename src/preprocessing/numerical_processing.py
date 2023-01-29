@@ -1,6 +1,6 @@
 import numpy as np
 
-from config import TICKS_PER_BEAT, STANDARDIZE
+from config import TICKS_PER_BEAT, STANDARDIZE, USE_LOG_SCALE
 
 def convert_to_log_scale(dataframe, column):
 
@@ -73,28 +73,22 @@ def inverse_normalize_data(sequence, max, min, negative_range=True):
     else:
         return (sequence * (max-min)) + min
 
-def sample_to_midi_values(sample, max_freq, min_freq,
-                        mean_dur, std_dur, mean_del, std_del):
-
-    sequence = sample[0] #(Notes length, 3)
-    sequence = np.transpose(sequence) #(3, Notes length)
-
-    frequencies = sequence[0]
-    durations = sequence[1]
-    deltas = sequence[2]
+def sample_to_midi_values(frequencies, durations, deltas, max_freq, min_freq,
+                        max_dur, min_dur, max_del, min_del):
 
     if STANDARDIZE:
         frequencies = inverse_normalize_data(frequencies, max_freq, min_freq)
-        durations = inverse_standardize_data(durations, mean_dur, std_dur)
-        deltas = inverse_standardize_data(deltas, mean_del, std_del)
+        durations = inverse_normalize_data(durations, max_dur, min_dur)
+        deltas = inverse_normalize_data(deltas, max_del, min_del)
 
-    #durations = convert_beats_to_ticks(durations)
-    #deltas = convert_beats_to_ticks(deltas)
+    if USE_LOG_SCALE:
+        frequencies = np.clip(frequencies, np.log10(min_freq), np.log10(max_freq))
+        frequencies = convert_to_pitch_scale(frequencies)
 
-    frequencies = np.clip(frequencies, None, np.log10(12543.850))
-    frequencies = convert_to_pitch_scale(frequencies)
+    else:
+        frequencies = np.clip(frequencies, min_freq, max_freq)
 
-    durations = np.clip(np.int_(durations), 1, None)
-    deltas = np.clip(np.int_(deltas), 0, None)
+    durations = np.clip(durations, min_dur, max_dur)
+    deltas = np.clip(deltas, min_del, max_del)
 
     return frequencies, durations, deltas

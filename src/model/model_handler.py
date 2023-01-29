@@ -5,6 +5,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import Input
 
 from src.model.diffusion import Diffusion
+from src.model.unet import UNet
 from src.preprocessing.numerical_processing import sample_to_midi_values
 from src.midi.midi_converter import MidiDataBuilder
 
@@ -29,12 +30,15 @@ class ModelHandler:
 
         self.max_freq = normalization_dict.get("max_freq")
         self.min_freq = normalization_dict.get("min_freq")
-        self.mean_dur = normalization_dict.get("mean_dur")
-        self.std_dur = normalization_dict.get("std_dur")
-        self.mean_del = normalization_dict.get("mean_del")
-        self.std_del = normalization_dict.get("std_del")
+        self.max_dur = normalization_dict.get("max_dur")
+        self.min_dur = normalization_dict.get("min_dur")
+        self.max_del = normalization_dict.get("max_del")
+        self.min_del = normalization_dict.get("min_del")
 
         self.model = None
+
+        self.duration_model = None
+        self.delta_model = None
 
         self.optimizer = None
 
@@ -44,7 +48,7 @@ class ModelHandler:
             self.load_model = LOAD_MODEL
 
         if self.weights_path is None:
-            self.weights_path = WEIGHTS_PATH
+            self.weights_path = WEIGHTS_PATH_FREQUENCY
 
     def build_model(self):
 
@@ -57,6 +61,24 @@ class ModelHandler:
 
             if self.verbose:
                 self.model.unet_model.summary()
+
+            self.load_supplementary_models()
+
+    def load_supplementary_models(self):
+
+        duration_weights_path = os.path.join(WEIGHTS_PATH_DURATION,"unet.h5")
+
+        if os.path.exists(duration_weights_path):
+            self.duration_model = UNet(self.input_shape, self.n_heads, None)
+            self.duration_model(Input(shape=self.input_shape))
+            self.duration_model.load_weights(duration_weights_path)
+
+        delta_weights_path = os.path.join(WEIGHTS_PATH_DELTA,"unet.h5")
+
+        if os.path.exists(delta_weights_path):
+            self.delta_model = UNet(self.input_shape, self.n_heads, None)
+            self.delta_model(Input(shape=self.input_shape))
+            self.delta_model.load_weights(delta_weights_path)
 
     def initialize_model(self):
 
@@ -108,7 +130,7 @@ class ModelHandler:
         #weights = self.model.get_network_weights()
 
         current_step = str(self.current_step).zfill(6)
-        save_path = UNET_WEIGHTS_PATH.format(current_step)
+        save_path = os.path.join(WEIGHTS_PATH_FREQUENCY,"unet_{}.h5").format(current_step)
 
         #np.save(save_path, weights)
 
@@ -130,24 +152,59 @@ class ModelHandler:
 
         self.current_step += 1
 
-    def save_samples(self):
+    def save_samples(self, n_samples=None, save_path=None):
 
         if self.verbose:
             print("\nGenerating samples...")
 
-        samples = self.model.sample(N_SAMPLES)
+        if n_samples is None:
+            n_samples = N_SAMPLES
 
-        samples = samples.numpy()
+        frequency_samples = self.model.sample(n_samples)
+        frequency_samples = frequency_samples.numpy()
 
-        for i, sample in enumerate(samples):
+        if self.duration_model is not None:
+            durations_samples = self.duration_model(frequency_samples)
+            durations_samples = durations_samples.numpy()
+
+        if self.delta_model is not None:
+            deltas_samples = self.delta_model(frequency_samples)
+            deltas_samples = deltas_samples.numpy()
+
+        for i in range(len(frequency_samples)):
+
+            frequency_sample = frequency_samples[i]
+            frequency_sequence = frequency_sample[0] #(Notes length, 1)
+            frequency_sequence = np.transpose(frequency_sequence) #(1, Notes length)
+
+            if self.duration_model is not None:
+                duration_sample = durations_samples[i]
+                duration_sequence = duration_sample[0] #(Notes length, 1)
+                duration_sequence = np.transpose(duration_sequence) #(1, Notes length)
+
+            if self.delta_model is not None:
+                delta_sample = deltas_samples[i]
+                delta_sequence = delta_sample[0] #(Notes length, 1)
+                delta_sequence = np.transpose(delta_sequence) #(1, Notes length)
+
+            frequencies = frequency_sequence[0]
+            durations = duration_sequence[0] if self.duration_model else None
+            deltas = delta_sequence[0] if self.delta_model else None
 
             frequencies, durations, deltas = sample_to_midi_values(
-            sample, self.max_freq, self.min_freq, self.mean_dur, self.std_dur,
-            self.mean_del, self.std_del
+            frequencies, durations, deltas,
+            self.max_freq, self.min_freq,
+            self.max_dur, self.min_dur,
+            self.max_del, self.min_del
             )
 
             midi_builder = MidiDataBuilder(frequencies, durations, deltas, self.notes)
-            file_path = SAMPLES_PATH.format(self.current_step, i+1)
+
+            if save_path is None:
+                file_path = SAMPLES_PATH.format(self.current_step, i+1)
+            else:
+                file_path = os.path.join(save_path, "sample_n_{}.mid").format(i+1)
+
             midi_builder.build_and_save(file_path)
 
         if self.verbose:
