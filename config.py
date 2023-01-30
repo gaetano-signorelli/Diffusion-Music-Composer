@@ -3,9 +3,10 @@ import os
 #Dataframe building
 VERBOSE = True
 STANDARDIZE = True
+USE_LOG_SCALE = False
 TICKS_PER_BEAT = 960
 BPM = 60
-NOTES_LENGTH = 32 # define the number of notes a piece of music can have
+NOTES_LENGTH = 128 # define the number of notes a piece of music can have
 
 #Paths
 NOTES_CONVERSION_TABLE_PATH = os.path.join("data","notes_conversion_table.txt")
@@ -26,7 +27,7 @@ TIME_EMBEDDING_SIZE = 256
 RUN_EAGERLY = True #False
 LEARNING_RATE = 1e-4 #3e-6
 EPOCHS = 1000
-BATCH_SIZE = 4
+BATCH_SIZE = 64
 
 #Saving/Loading
 SAVE_MODEL = True
