@@ -17,10 +17,12 @@ def load_dataset(notes):
     dataframe_handler = DataframeHandler(DATASET_PATH, notes, VERBOSE)
     dataframe = dataframe_handler.get()
 
-    if VERBOSE:
-        print("Converting pitches to log scale")
+    if USE_LOG_SCALE:
 
-    numerical_processing.convert_to_log_scale(dataframe, "Frequencies")
+        if VERBOSE:
+            print("Converting pitches to log scale")
+
+        numerical_processing.convert_to_log_scale(dataframe, "Frequencies")
 
     if VERBOSE:
         print("Converting ticks to beats")
@@ -35,16 +37,17 @@ def load_dataset(notes):
 
         max_freq, min_freq = numerical_processing.normalize_data(dataframe, "Frequencies")
         #mean_freq, std_freq = numerical_processing.standardize_data(dataframe, "Frequencies")
-        mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
-        mean_del, std_del = numerical_processing.standardize_data(dataframe, "Deltas")
+        max_dur, min_dur = numerical_processing.normalize_data(dataframe, "Durations")
+        #mean_dur, std_dur = numerical_processing.standardize_data(dataframe, "Durations")
+        max_del, min_del = numerical_processing.normalize_data(dataframe, "Deltas")
 
         normalization_dict = {
         "max_freq":max_freq,
         "min_freq":min_freq,
-        "mean_dur":mean_dur,
-        "std_dur":std_dur,
-        "mean_del":mean_del,
-        "std_del":std_del
+        "max_dur":max_dur,
+        "min_dur":min_dur,
+        "max_del":max_del,
+        "min_del":min_del
         }
 
         with open(STATISTICS_PATH, 'wb') as handle:

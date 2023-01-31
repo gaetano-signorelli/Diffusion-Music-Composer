@@ -29,10 +29,10 @@ class ModelHandler:
 
         self.max_freq = normalization_dict.get("max_freq")
         self.min_freq = normalization_dict.get("min_freq")
-        self.mean_dur = normalization_dict.get("mean_dur")
-        self.std_dur = normalization_dict.get("std_dur")
-        self.mean_del = normalization_dict.get("mean_del")
-        self.std_del = normalization_dict.get("std_del")
+        self.max_dur = normalization_dict.get("max_dur")
+        self.min_dur = normalization_dict.get("min_dur")
+        self.max_del = normalization_dict.get("max_del")
+        self.min_del = normalization_dict.get("min_del")
 
         self.model = None
 
@@ -142,8 +142,8 @@ class ModelHandler:
         for i, sample in enumerate(samples):
 
             frequencies, durations, deltas = sample_to_midi_values(
-            sample, self.max_freq, self.min_freq, self.mean_dur, self.std_dur,
-            self.mean_del, self.std_del
+            sample, self.max_freq, self.min_freq, self.max_dur, self.min_dur,
+            self.max_del, self.min_del
             )
 
             midi_builder = MidiDataBuilder(frequencies, durations, deltas, self.notes)
