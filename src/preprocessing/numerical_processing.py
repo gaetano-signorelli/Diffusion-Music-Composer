@@ -40,7 +40,7 @@ def standardize_data(dataframe, column):
 
     return mean, std
 
-def normalize_data(dataframe, column, negative_range=True):
+def normalize_data(dataframe, column, negative_range=False):
 
     max, min = get_normal_statistics(dataframe, column)
 
@@ -65,7 +65,7 @@ def convert_beats_to_ticks(sequence):
 def inverse_standardize_data(sequence, mean, std):
     return (sequence * std) + mean
 
-def inverse_normalize_data(sequence, max, min, negative_range=True):
+def inverse_normalize_data(sequence, max, min, negative_range=False):
 
     if negative_range:
         return ((sequence + 1) / 2 * (max-min)) + min

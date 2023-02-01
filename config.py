@@ -17,7 +17,7 @@ WEIGHTS_PATH = "weights"
 UNET_WEIGHTS_PATH = os.path.join(WEIGHTS_PATH,"unet_{}.h5")
 
 #Diffusion
-BETA_START = 1e-4
+BETA_START = 3e-6
 BETA_END = 0.02
 NOISE_STEPS = 1000
 N_HEADS = 2
