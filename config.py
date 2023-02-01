@@ -26,7 +26,7 @@ TIME_EMBEDDING_SIZE = 256
 #Training
 RUN_EAGERLY = True #False
 LEARNING_RATE = 1e-4 #3e-6
-EPOCHS = 1000
+EPOCHS = 500
 BATCH_SIZE = 64
 
 #Saving/Loading
