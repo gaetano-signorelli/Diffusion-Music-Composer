@@ -130,12 +130,15 @@ class ModelHandler:
 
         self.current_step += 1
 
-    def save_samples(self):
+    def save_samples(self, n_samples=None, save_path=None):
 
         if self.verbose:
             print("\nGenerating samples...")
 
-        samples = self.model.sample(N_SAMPLES)
+        if n_samples is None:
+            n_samples = N_SAMPLES
+
+        samples = self.model.sample(n_samples)
 
         samples = samples.numpy()
 
@@ -147,7 +150,12 @@ class ModelHandler:
             )
 
             midi_builder = MidiDataBuilder(frequencies, durations, deltas, self.notes)
-            file_path = SAMPLES_PATH.format(self.current_step, i+1)
+
+            if save_path is None:
+                file_path = SAMPLES_PATH.format(self.current_step, i+1)
+            else:
+                file_path = os.path.join(save_path, "sample_n_{}.mid").format(i+1)
+
             midi_builder.build_and_save(file_path)
 
         if self.verbose:
