@@ -4,7 +4,7 @@ from tensorflow.keras import layers, Model
 from src.model.layers.conv_block_layer import ConvolutionalBlockLayer
 from src.model.layers.down_sample_layer import DownSampleLayer
 from src.model.layers.up_sample_layer import UpSampleLayer
-from src.model.layers.positional_encoding_layer import PositionalEncodingLayer
+from src.model.layers.positional_encoding_layer import TimePositionalEncodingLayer, SpatialPositionalEncodingLayer
 from src.model.layers.self_attention_layer import SelfAttentionLayer
 
 class UNet(Model):
@@ -19,15 +19,19 @@ class UNet(Model):
 
         assert self.w % 8 == 0
 
-        self.positional_encoding_layer = PositionalEncodingLayer(time_embedding_size)
+        self.time_positional_encoding_layer = TimePositionalEncodingLayer(time_embedding_size)
 
         self.conv_input = ConvolutionalBlockLayer(7,64)
+        #self.spatial_positional_encoding_layer_1 = SpatialPositionalEncodingLayer(self.w, 64)
 
         self.down1 = DownSampleLayer((self.h,self.w,64), 128, 5)
+        #self.spatial_positional_encoding_layer_2 = SpatialPositionalEncodingLayer(self.w//2, 128)
         self.sa1 = SelfAttentionLayer((self.h,self.w//2,128), n_heads)
         self.down2 = DownSampleLayer((self.h,self.w//2,128), 256, 5)
+        #self.spatial_positional_encoding_layer_3 = SpatialPositionalEncodingLayer(self.w//4, 256)
         self.sa2 = SelfAttentionLayer((self.h,self.w//4,256), n_heads)
         self.down3 = DownSampleLayer((self.h,self.w//4,256), 256, 5)
+        #self.spatial_positional_encoding_layer_4 = SpatialPositionalEncodingLayer(self.w//8, 256)
         self.sa3 = SelfAttentionLayer((self.h,self.w//8,256), n_heads)
 
         self.conv_mid_1 = ConvolutionalBlockLayer(3,512)
@@ -49,16 +53,22 @@ class UNet(Model):
         x = inputs[0]
         t = inputs[1]
 
-        t = self.positional_encoding_layer(t)
+        t = self.time_positional_encoding_layer(t)
 
         x1 = self.conv_input(x)
-        x2 = self.down1([x1, t])
-        x2 = self.sa1(x2)
-        x3 = self.down2([x2, t])
-        x3 = self.sa2(x3)
-        x4 = self.down3([x3, t])
-        x4 = self.sa3(x4)
+        #x1 = self.spatial_positional_encoding_layer_1(x1)
 
+        x2 = self.down1([x1, t])
+        #x2 = self.spatial_positional_encoding_layer_2(x2)
+        x2 = self.sa1(x2)
+
+        x3 = self.down2([x2, t])
+        #x3 = self.spatial_positional_encoding_layer_3(x3)
+        x3 = self.sa2(x3)
+
+        x4 = self.down3([x3, t])
+        #x4 = self.spatial_positional_encoding_layer_4(x4)
+        x4 = self.sa3(x4)
         x4 = self.conv_mid_1(x4)
         x4 = self.conv_mid_2(x4)
         x4 = self.conv_mid_3(x4)
