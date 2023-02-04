@@ -40,7 +40,7 @@ def standardize_data(dataframe, column):
 
     return mean, std
 
-def normalize_data(dataframe, column, negative_range=True):
+def normalize_data(dataframe, column, negative_range=False):
 
     max, min = get_normal_statistics(dataframe, column)
 
@@ -65,7 +65,7 @@ def convert_beats_to_ticks(sequence):
 def inverse_standardize_data(sequence, mean, std):
     return (sequence * std) + mean
 
-def inverse_normalize_data(sequence, max, min, negative_range=True):
+def inverse_normalize_data(sequence, max, min, negative_range=False):
 
     if negative_range:
         return ((sequence + 1) / 2 * (max-min)) + min
@@ -85,7 +85,7 @@ def sample_to_midi_values(sample, max_freq, min_freq,
     if STANDARDIZE:
         frequencies = inverse_normalize_data(frequencies, max_freq, min_freq)
         durations = inverse_normalize_data(durations, max_dur, min_dur)
-        deltas = inverse_normalize_data(deltas, min_del, max_del)
+        deltas = inverse_normalize_data(deltas, max_del, min_del)
 
     #durations = convert_beats_to_ticks(durations)
     #deltas = convert_beats_to_ticks(deltas)
