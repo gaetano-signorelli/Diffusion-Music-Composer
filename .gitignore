@@ -4,4 +4,5 @@ __pycache__
 
 data/Classical music dataset
 data/Maestro dataset
+data/Free midi dataset
 weights
