@@ -7,6 +7,8 @@ from config import TICKS_PER_BEAT, BPM
 ON = "note_on"
 OFF = "note_off"
 
+PIANO_IDS = [0,1,2,3,4,5,6,7,16,17,18,19,20,21,22,23]
+
 class NoteData:
 
     def __init__(self):
@@ -91,16 +93,35 @@ class MidiDataExtractor:
 
     def __get_main_track(self):
 
-        if len(self.midi.tracks)==1:
-            return self.midi.tracks[0]
+        valid_tracks = []
 
-        main_track = self.midi.tracks[0]
+        for track in self.midi.tracks:
+            valid=False
+            for msg in track:
+                if msg.type == 'program_change':
+                    if msg.program not in PIANO_IDS:
+                        valid=False
+                        break
+                    else:
+                        valid=True
 
-        for track in self.midi.tracks[1:]:
-            if len(track)>len(main_track):
-                main_track = track
+            if valid:
+                valid_tracks.append(track)
 
-        return main_track
+        if len(valid_tracks)==0:
+            return []
+
+        elif len(valid_tracks)==1:
+            return valid_tracks[0]
+
+        else:
+            main_track = valid_tracks[0]
+
+            for track in valid_tracks[1:]:
+                if len(track)>len(main_track):
+                    main_track = track
+
+            return main_track
 
     def __get_notes_messages(self, track):
 

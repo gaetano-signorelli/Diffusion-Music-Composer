@@ -7,7 +7,7 @@ import numpy as np
 
 from src.midi.midi_converter import MidiDataExtractor
 
-from config import DATAFRAME_PATH, NOTES_LENGTH
+from config import DATAFRAME_PATH, NOTES_LENGTH, MAX_DURATION, MAX_DELTA
 
 class DataframeHandler:
 
@@ -63,35 +63,55 @@ class DataframeHandler:
         dataframe_rows = []
 
         for file in tqdm(os.listdir(self.dataset_path)):
-            if file.endswith(".mid"):
+            if file.endswith(".mid") or file.endswith(".midi"):
                 file_path = os.path.join(self.dataset_path, file)
 
-                data_extractor = MidiDataExtractor(file_path, self.notes)
-                note_datas = data_extractor.get_data()
+                try:
+                    data_extractor = MidiDataExtractor(file_path, self.notes)
+                    note_datas = data_extractor.get_data()
 
-                frequencies, durations, deltas = self.__collect_data(note_datas)
+                    frequencies, durations, deltas = self.__collect_data(note_datas)
 
-                chunk_frequencies = self.__split_data(frequencies)
-                chunk_durations = self.__split_data(durations)
-                chunk_deltas = self.__split_data(deltas)
+                    if not self.__is_valid_data(frequencies, durations, deltas):
+                        continue
 
-                assert len(chunk_frequencies)==len(chunk_durations)
-                assert len(chunk_durations)==len(chunk_deltas)
+                    chunk_frequencies = self.__split_data(frequencies)
+                    chunk_durations = self.__split_data(durations)
+                    chunk_deltas = self.__split_data(deltas)
 
-                for i in range(len(chunk_frequencies)):
+                    assert len(chunk_frequencies)==len(chunk_durations)
+                    assert len(chunk_durations)==len(chunk_deltas)
 
-                    row = {
-                    "File name": file,
-                    "Frequencies": chunk_frequencies[i],
-                    "Durations": chunk_durations[i],
-                    "Deltas": chunk_deltas[i]
-                    }
+                    for i in range(len(chunk_frequencies)):
 
-                    dataframe_rows.append(row)
+                        row = {
+                        "File name": file,
+                        "Frequencies": chunk_frequencies[i],
+                        "Durations": chunk_durations[i],
+                        "Deltas": chunk_deltas[i]
+                        }
+
+                        dataframe_rows.append(row)
+
+                except:
+                    continue
 
         dataframe = pd.DataFrame(dataframe_rows)
 
         return dataframe
+
+    def __is_valid_data(self, frequencies, durations, deltas):
+
+        if (frequencies==None).any() or (durations==None).any() or (deltas==None).any():
+            return False
+
+        if (np.isnan(frequencies)).any() or (np.isnan(durations)).any() or (np.isnan(deltas)).any():
+            return False
+
+        if (durations > MAX_DURATION).any() or (deltas > MAX_DELTA).any():
+            return False
+
+        return True
 
     def __collect_data(self, note_datas):
 
