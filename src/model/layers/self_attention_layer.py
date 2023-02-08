@@ -29,7 +29,7 @@ class SelfAttentionLayer(layers.Layer):
 
         norm_x = self.layer_normalization_1(x)
 
-        attention_x = self.self_attention_layer(norm_x, norm_x)
+        attention_x = self.self_attention_layer(norm_x, norm_x, use_causal_mask=True)
         attention_x = attention_x + x
 
         linear_attention_x = self.layer_normalization_2(attention_x)
