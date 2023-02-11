@@ -22,7 +22,7 @@ class UNet(Model):
         self.time_positional_encoding_layer = TimePositionalEncodingLayer(time_embedding_size)
 
         self.conv_input = ConvolutionalBlockLayer(7,64)
-        #self.spatial_positional_encoding_layer_1 = SpatialPositionalEncodingLayer(self.w, 64)
+        self.spatial_positional_encoding_layer_1 = SpatialPositionalEncodingLayer(self.w, 64)
 
         self.down1 = DownSampleLayer((self.h,self.w,64), 128, 5)
         #self.spatial_positional_encoding_layer_2 = SpatialPositionalEncodingLayer(self.w//2, 128)
@@ -56,7 +56,7 @@ class UNet(Model):
         t = self.time_positional_encoding_layer(t)
 
         x1 = self.conv_input(x)
-        #x1 = self.spatial_positional_encoding_layer_1(x1)
+        x1 = self.spatial_positional_encoding_layer_1(x1)
 
         x2 = self.down1([x1, t])
         #x2 = self.spatial_positional_encoding_layer_2(x2)
