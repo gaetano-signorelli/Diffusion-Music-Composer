@@ -3,3 +3,4 @@ numpy
 tqdm
 mido
 MIDIUtil
+bs4

@@ -14,7 +14,7 @@ NOTES_LENGTH = 128 # define the number of notes a piece of music can have
 NOTES_CONVERSION_TABLE_PATH = os.path.join("data","notes_conversion_table.txt")
 DATAFRAME_PATH = os.path.join("data","dataframe.pkl")
 STATISTICS_PATH = os.path.join("data","statistics.pkl")
-DATASET_PATH = os.path.join("data","Maestro dataset")
+DATASET_PATH = os.path.join("data","datasets","LAKH","Full")
 WEIGHTS_PATH = "weights"
 UNET_WEIGHTS_PATH = os.path.join(WEIGHTS_PATH,"unet_{}.h5")
 
@@ -27,14 +27,14 @@ TIME_EMBEDDING_SIZE = 256
 
 #Training
 RUN_EAGERLY = True #False
-LEARNING_RATE = 1e-4
-EPOCHS = 100
+LEARNING_RATE = 1e-4 #1e-6
+EPOCHS = 20
 BATCH_SIZE = 64
 
 #Saving/Loading
 SAVE_MODEL = True
 LOAD_MODEL = True
-EPOCHS_BEFORE_SAVE = 50
+EPOCHS_BEFORE_SAVE = 2
 
 #Sampling
 N_SAMPLES = 2

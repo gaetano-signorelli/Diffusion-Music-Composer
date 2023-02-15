@@ -8,6 +8,9 @@ ON = "note_on"
 OFF = "note_off"
 
 PIANO_IDS = [0,1,2,3,4,5,6,7,16,17,18,19,20,21,22,23]
+GUITAR_IDS = [25,26,27,28,29,30,31,32]
+ALL_IDS = [0,1,2,3,4,5,6,7,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,
+            36,37,38,39,40,41,42,43,44,45,46,47,48]
 
 class NoteData:
 
@@ -151,6 +154,7 @@ class MidiDataBuilder:
 
         song = MIDIFile(1, deinterleave=False) # One track, defaults to format 1 (tempo track automatically created)
         song.addTempo(track, time, tempo)
+        #song.addProgramChange(track, channel, time, 32)
 
         for pitch, duration, delta in zip(pitches, self.durations, self.deltas):
             time += delta

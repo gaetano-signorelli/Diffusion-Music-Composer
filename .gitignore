@@ -2,7 +2,7 @@ __pycache__
 *.pyc
 *.pkl
 
-data/Classical music dataset
-data/Maestro dataset
-data/Free midi dataset
-weights
+*.mid
+*.midi
+!data/samples/selected/*.mid
+!data/samples/selected/*.midi
