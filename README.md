@@ -33,7 +33,7 @@ The method proposed here is simpler: each pitch is encoded by its corresponding 
 
 - Each convolution has been enhanced by introducing a [**Squeeze and Excitation** layer](https://arxiv.org/abs/1709.01507).
 
-- The model is quite **lightweight** (around 12M parameters) and can learn fast.
+- The model is quite **lightweight** (around 12M parameters) and can learn quickly.
 
 ## Results
 
@@ -80,4 +80,4 @@ To start a new training session (or recover from the last training epoch), run t
 
 `python train.py`
 
-Training parameters can be adjusted by accessing the file *src/config.py*.
+Training parameters can be adjusted by accessing the file *config.py*.
