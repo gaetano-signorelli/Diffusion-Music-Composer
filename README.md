@@ -29,7 +29,7 @@ The method proposed here is simpler: each pitch is encoded by its corresponding 
 
 - The entire pipeline could be easily extended, by increasing the height dimension of the inputs, to include **multiple instruments** at a time.
 
-- This U-Net has been changed so that all the convolutions are **causal** (each set of features depends only on the previous ones), as well as the self-attention modules, with the inclusion of the spatial positional encoding. Furthermore, the kernel size varies accordingly with the compression level and embeddings are only halved along the width dimension each time.
+- This U-Net has been changed so that all the convolutions are **causal** (each set of features depends only on the previous ones), as well as the self-attention modules, with the inclusion of the **spatial positional encoding**. Furthermore, the kernel size varies accordingly with the compression level and embeddings are only halved along the width dimension each time.
 
 - Each convolution has been enhanced by introducing a [**Squeeze and Excitation** layer](https://arxiv.org/abs/1709.01507).
 
